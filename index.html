@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12141a">
+  <title>AMR</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #e9e7dc;
+      --page: #f7f5eb;
+      --ink: #252a35;
+      --muted: #77786f;
+      --line: #b9b8aa;
+      --blue: #0000aa;
+      --purple: #650080;
+      --red: #a32626;
+      --green: #28613a;
+      --heading: #30384a;
+      --texture: #77786f22;
+      --page-edge: #a5a597;
+      --page-shadow: #b9b8aa;
+      --welcome-bg: #efeee4;
+      --ascii-color: #34445e;
+      --row-line: #d1cfc2;
+      --counter-bg: #20251f;
+      --counter-text: #d6e6c8;
+      --construction-light: #f2df7a;
+      --construction-dark: #28251b;
+      --construction-label: #f5e99b;
+      --construction-ink: #252116;
+      --guest-bg: #efeee4;
+      --hover-bg: #fff6a8;
+      --selection-bg: #d9d0ff;
+      --selection-ink: #161616;
+    }
+
+    body[data-theme="night"] {
+      color-scheme: dark;
+      --paper: #12141a;
+      --page: #1b1e26;
+      --ink: #dedfe6;
+      --muted: #9295a0;
+      --line: #454956;
+      --blue: #a6c8ff;
+      --purple: #d0a7f5;
+      --red: #f08b83;
+      --green: #9be2a2;
+      --heading: #e0dfd4;
+      --texture: #ffffff0d;
+      --page-edge: #555967;
+      --page-shadow: #08090d;
+      --welcome-bg: #252832;
+      --ascii-color: #a2bfdc;
+      --row-line: #353945;
+      --counter-bg: #10140f;
+      --counter-text: #b9f0b5;
+      --construction-light: #7a6b2d;
+      --construction-dark: #25242a;
+      --construction-label: #f0e4a2;
+      --construction-ink: #242016;
+      --guest-bg: #252832;
+      --hover-bg: #373b47;
+      --selection-bg: #544a70;
+      --selection-ink: #ffffff;
+    }
+
+    body[data-theme="mint"] {
+      --paper: #dce8dc;
+      --page: #f0f7ec;
+      --ink: #25372d;
+      --muted: #687b6c;
+      --line: #a8bba8;
+      --blue: #165a48;
+      --purple: #71508a;
+      --red: #98503e;
+      --green: #27613b;
+      --heading: #294a3a;
+      --texture: #4e765422;
+      --page-edge: #9aaf9a;
+      --page-shadow: #a7bba7;
+      --welcome-bg: #e4efe1;
+      --ascii-color: #315b49;
+      --row-line: #c9d9c6;
+      --counter-bg: #213126;
+      --counter-text: #d8f1d1;
+      --construction-light: #eedf86;
+      --construction-dark: #354235;
+      --construction-label: #f4e9a8;
+      --construction-ink: #263126;
+      --guest-bg: #e4efe1;
+      --hover-bg: #edf3b5;
+      --selection-bg: #cfdfc7;
+      --selection-ink: #18271b;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      padding: 28px 14px;
+      background-color: var(--paper);
+      background-image: radial-gradient(var(--texture) .65px, transparent .65px);
+      background-size: 7px 7px;
+      color: var(--ink);
+      font: 13px/1.65 "Courier New", Courier, monospace;
+      transition: background-color .2s, color .2s;
+    }
+    .page { position: relative; z-index: 1; }
+
+    .control-strip {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .retro-button {
+      padding: 3px 7px;
+      border: 2px outset #d7d4c7;
+      border-radius: 0;
+      background: var(--welcome-bg);
+      color: var(--ink);
+      font: 11px "Courier New", Courier, monospace;
+      cursor: pointer;
+    }
+    .retro-button:active { border-style: inset; }
+    .retro-button:focus-visible { outline: 1px dotted var(--blue); outline-offset: 2px; }
+    body[data-theme="night"] .retro-button { border-color: #555967; }
+    body[data-theme="mint"] .retro-button { border-color: #a7bba7; }
+    a { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
+    a:visited { color: var(--purple); }
+    a:hover { color: var(--red); background: var(--hover-bg); }
+    ::selection { background: var(--selection-bg); color: var(--selection-ink); }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 20px 24px 15px;
+      background: var(--page);
+      border: 1px solid var(--page-edge);
+      box-shadow: 4px 4px 0 var(--page-shadow);
+    }
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      padding-bottom: 8px;
+      color: var(--muted);
+      border-bottom: 1px dotted var(--line);
+      font-size: 11px;
+    }
+    .online { color: var(--green); }
+    .masthead { text-align: center; padding: 26px 0 19px; }
+    .tiny-star { color: #b14d34; font-size: 17px; }
+    h1 {
+      margin: 7px 0 0;
+      font: bold clamp(25px, 5vw, 39px)/1.12 Georgia, "Times New Roman", serif;
+      letter-spacing: -1.2px;
+    }
+    .subtitle { margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+    .welcome { margin: 14px auto 0; display: table; padding: 4px 9px; border: 1px dotted var(--line); background: var(--welcome-bg); }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 7px 17px;
+      margin: 6px 0 15px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+    nav a { white-space: nowrap; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 172px; gap: 22px; }
+    main { min-width: 0; }
+    aside { min-width: 0; border-left: 1px dotted var(--line); padding-left: 15px; }
+    section { margin: 0 0 24px; }
+    h2 {
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      color: var(--heading);
+      border-bottom: 1px dotted var(--line);
+      font: bold 16px Georgia, "Times New Roman", serif;
+    }
+    h2 .num { color: var(--red); font: 11px "Courier New", monospace; }
+    p { margin: 8px 0; }
+    .intro { font-size: 14px; }
+    .signature { color: var(--muted); font-size: 11px; }
+    .ascii {
+      margin: 14px 0 4px;
+      color: var(--ascii-color);
+      text-align: center;
+      white-space: pre;
+      font-size: 11px;
+      line-height: 1.25;
+    }
+    .link-list { list-style: square; padding-left: 19px; margin: 7px 0; }
+    .link-list li { padding: 2px 0; }
+    .project-row { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 7px; padding: 8px 0; border-bottom: 1px dotted var(--row-line); }
+    .project-row:last-child { border-bottom: 0; }
+    .project-index { color: var(--red); }
+    .project-note { display: block; color: var(--muted); font-size: 11px; }
+
+    .side-box { margin-bottom: 17px; }
+    .side-title { margin-bottom: 5px; color: var(--muted); font-size: 10px; letter-spacing: .7px; text-transform: uppercase; }
+    .side-box p { margin: 4px 0; }
+    .mini-counter {
+      display: inline-block;
+      padding: 2px 6px;
+      color: var(--counter-text);
+      background: var(--counter-bg);
+      border: 2px inset #aaa;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+    .status-stamp {
+      display: inline-block;
+      padding: 3px 6px;
+      border: 1px solid var(--red);
+      color: var(--red);
+      font-weight: bold;
+      font-size: 10px;
+      transform: rotate(-3deg);
+    }
+    .construction {
+      padding: 7px 5px;
+      border: 1px solid #8e7c30;
+      background: repeating-linear-gradient(135deg, var(--construction-light) 0 7px, var(--construction-dark) 7px 14px);
+      text-align: center;
+    }
+    .construction span {
+      display: inline-block;
+      padding: 2px 5px;
+      color: var(--construction-ink);
+      background: var(--construction-label);
+      font-weight: bold;
+      font-size: 10px;
+    }
+    .guestbook {
+      display: inline-block;
+      padding: 3px 7px;
+      color: var(--blue);
+      background: var(--guest-bg);
+      border: 2px outset var(--line);
+      text-decoration: none;
+    }
+    .guestbook:active { border-style: inset; }
+
+    footer {
+      margin-top: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .footer-links { margin-top: 5px; }
+    .footer-links a { margin: 0 5px; }
+
+    @media (max-width: 600px) {
+      body { padding: 10px 7px; }
+      .page { padding: 15px 14px 12px; box-shadow: 2px 2px 0 var(--page-shadow); }
+      .control-strip { justify-content: center; }
+      .layout { grid-template-columns: 1fr; gap: 8px; }
+      aside { border-left: 0; border-top: 1px dotted var(--line); padding: 15px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 15px; }
+      .side-box { margin-bottom: 5px; }
+      .masthead { padding-top: 22px; }
+      nav { gap: 6px 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body data-theme="night">
+  <div class="page" id="top">
+    <div class="control-strip" id="controlStrip" aria-label="Настройки оформления">
+      <button class="retro-button" id="themeToggle" type="button" aria-label="Сменить тему">Тема: ночь</button>
+      <button class="retro-button" id="langToggle" type="button" aria-label="Translate to English">🌐 EN</button>
+    </div>
+
+    <header class="masthead">
+      <div class="tiny-star">＊ · ˚ ✦ ˚ · ＊</div>
+      <h1 data-lang-key="welcome">Привет username.</h1>
+      <p class="subtitle" data-lang-key="subtitle">я вас не звал. дитенах</p>
+      <div class="ascii" aria-label="ASCII рисунок кота"> /\_/\\
+( o.o )
+ &gt; ^ &lt;</div>
+    </header>
+
+    <div class="layout">
+      <main>
+        <section id="about">
+          <h2><span class="num">01 //</span> <span data-lang-key="about-title">Обо мне</span></h2>
+          <p class="intro" data-lang-key="about-intro">Меня зовут <strong>amr</strong>.</p>
+          <p data-lang-key="about-text">Backend разраб на Go, linux user btw, фотограф по хотению, виртуальный гонщик по любви.</p>
+        </section>
+
+        <section id="links">
+          <h2><span class="num">02 //</span> <span data-lang-key="links-title">Ссылки</span></h2>
+          <ul class="link-list">
+            <li><a href="https://github.com/Terabit-off" target="_blank" rel="GitHub">GitHub</a></li>
+            <li><a href="https://example.com/" target="_blank" rel="noreferrer" data-lang-key="link-project">Будущий проект</a></li>
+          </ul>
+        </section>
+
+        <section id="contact">
+          <h2><span class="num">03 //</span> <span data-lang-key="contacts-title">Контакты</span></h2>
+          <p><a href="mailto:engterabit@gmail.com">engterabit@gmail.com</a></p>
+          <a class="guestbook" href="https://t.me/TerBitCore" data-lang-key="contact-tg">✉ Написать сообщение в тг</a>
+        </section>
+
+        <section>
+          <img src="https://i.pinimg.com/736x/76/14/11/761411975a36bc802418cf840128e272.jpg" width="100%">
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      <div>© 1951-2027 amr</div>
+    </footer>
+  </div>
+
+  <script>
+    /* --- Переводы --- */
+    const translations = {
+      ru: {
+        "control-strip": "Настройки оформления",
+        "theme-toggle": "Сменить тему",
+        "welcome": "Привет username.",
+        "subtitle": "я вас не звал. дитенах. но если звал, то ладно",
+        "about-title": "Обо мне",
+        "about-intro": "Меня зовут <strong>amr</strong>.",
+        "about-text": "Backend разраб на Go, фотограф по хотению, виртуальный гонщик по любви, все еще человек в интернете. linux user btw",
+        "links-title": "Ссылки",
+        "link-project": "Будущий проект",
+        "contacts-title": "Контакты",
+        "contact-tg": "✉ Cообщение в тг"
+      },
+      en: {
+        "control-strip": "Appearance settings",
+        "theme-toggle": "Change theme",
+        "welcome": "Hello username.",
+        "subtitle": "i didn't invite you. get the f out. But if invite, your welcome",
+        "about-title": "About me",
+        "about-intro": "My name is <strong>amr</strong>.",
+        "about-text": "Backend dev in Go, photographer by choice, online <s>racist</s> racer by love, still a human on the internet. linux user btw",
+        "links-title": "Links",
+        "link-project": "Future project",
+        "contacts-title": "Contacts",
+        "contact-tg": "✉ Message in telegram"
+      }
+    };
+
+    const themeNames = {
+      ru: { night: 'ночь', paper: 'бумага', mint: 'мята' },
+      en: { night: 'night', paper: 'paper', mint: 'mint' }
+    };
+    const themePrefix = { ru: 'Тема: ', en: 'Theme: ' };
+
+    /* --- Состояние --- */
+    const themeOrder = ['night', 'paper', 'mint'];
+    let currentTheme = 'night';
+
+    let currentLang = 'ru';
+    try { currentLang = localStorage.getItem('amrLang') || 'ru'; } catch (e) {}
+    if (!translations[currentLang]) currentLang = 'ru';
+
+    /* --- Элементы --- */
+    const themeButton = document.getElementById('themeToggle');
+    const langButton  = document.getElementById('langToggle');
+    const controlStrip = document.getElementById('controlStrip');
+
+    /* --- Кнопка темы (текст зависит и от темы, и от языка) --- */
+    function updateThemeButton() {
+      themeButton.textContent = themePrefix[currentLang] + themeNames[currentLang][currentTheme];
+      themeButton.setAttribute('aria-label', translations[currentLang]['theme-toggle']);
+    }
+
+    /* --- Кнопка языка --- */
+    function updateLangButton() {
+      langButton.textContent = currentLang === 'ru' ? '🌐 EN' : '🌐 RU';
+      const label = currentLang === 'ru' ? 'Translate to English' : 'Перевести на русский';
+      langButton.setAttribute('aria-label', label);
+      langButton.title = label;
+    }
+
+    /* --- Тема --- */
+    function applyTheme(theme) {
+      currentTheme = themeOrder.includes(theme) ? theme : 'night';
+      document.body.dataset.theme = currentTheme;
+      const themeColors = { night: '#12141a', paper: '#e9e7dc', mint: '#dce8dc' };
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColors[currentTheme]);
+      try { localStorage.setItem('littleCornerThemeV2', currentTheme); } catch (e) {}
+      updateThemeButton();
+    }
+
+    /* --- Перевод страницы --- */
+    function translatePage(lang) {
+      if (!translations[lang]) lang = 'ru';
+      currentLang = lang;
+
+      document.querySelectorAll('[data-lang-key]').forEach(el => {
+        const key = el.dataset.langKey;
+        const val = translations[lang][key];
+        if (val !== undefined) el.innerHTML = val;
+      });
+
+      document.documentElement.lang = lang;
+      controlStrip.setAttribute('aria-label', translations[lang]['control-strip']);
+
+      updateThemeButton();
+      updateLangButton();
+
+      try { localStorage.setItem('amrLang', lang); } catch (e) {}
+    }
+
+    /* --- Инициализация --- */
+    try {
+      applyTheme(localStorage.getItem('littleCornerThemeV2') || 'night');
+    } catch (e) {
+      applyTheme('night');
+    }
+
+    translatePage(currentLang);
+
+    /* --- Обработчики --- */
+    themeButton.addEventListener('click', () => {
+      const nextIndex = (themeOrder.indexOf(currentTheme) + 1) % themeOrder.length;
+      applyTheme(themeOrder[nextIndex]);
+    });
+
+    langButton.addEventListener('click', () => {
+      translatePage(currentLang === 'ru' ? 'en' : 'ru');
+    });
+  </script>
+</body>
+</html>
